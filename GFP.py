@@ -1,3 +1,18 @@
+# Writen by Stephen Bonner 2016
+#This file is part of GraphFingerprintComparison.
+
+#GraphFingerprintComparison is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+
+#GraphFingerprintComparison is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with GraphFingerprintComparison.  If not, see <http://www.gnu.org/licenses/>.
 from graph_tool.all import *
 import os, csv
 from tabulate import tabulate
@@ -29,7 +44,6 @@ def vertexFeatureExtraction(v, tempG, egoNet):
     twoHopAwayNeighbours = 0
     egoNet.a = False
     egoNet[v] = True
-    #visitedVertices[v] = True
 
     # iterate over the neighbour vertices of the current vertex
     for w in v.out_neighbours():
@@ -42,21 +56,6 @@ def vertexFeatureExtraction(v, tempG, egoNet):
 
         # 5) - Ego net
         egoNet[w] = True
-    #------------------------NEIGHBOURHOOD FOR LOOP END------------------------#
-    # Generate the EgoNet Graph
-    #egoNetGV = GraphView(tempG, vfilt=egoNet)
-    #egoOutEdges = 0
-    #numEgoNeigh = set()
-
-    # 6) - Number of out going edges
-    #for egoV in egoNetGV.vertices():
-        # Collect the number of out going edges from the Ego Net subtract by the number already in the egonet
-    #    egoOutEdges += tempG.vp.dp[egoV]
-
-        # Loop through each level 2 nodes and add to a set, then take the len to give the number of neghbours of the egonet
-    #    for egoNetW in egoV.out_neighbours():
-    #        numEgoNeigh.add(int(egoNetW))
-    #egoOutEdges = (egoOutEdges - egoNetGV.num_edges())
 
     # Store the computed results in the property maps of the graph
     # Fix the possibily of zero degrees
@@ -66,10 +65,6 @@ def vertexFeatureExtraction(v, tempG, egoNet):
     else:
         tempG.vp.tHN[v] = ((1.0 / 1.0) * float(twoHopAwayNeighbours))
         tempG.vp.nCCP[v] = ((1.0 / 1.0) * float(averageNeighbourhoodScore))
-    #tempG.vp.nEEG[v] = egoNetGV.num_edges()
-    #tempG.vp.oEEG[v] = egoOutEdges
-    #tempG.vp.oNEG[v] = len(numEgoNeigh)
-    # CREATE A NEW GRAPH THAT IS JUST THE VERTICES WHICH HAVE BEEN TOUCHED BY THE RANDOM WALK
 
     return tempG
 
@@ -117,23 +112,15 @@ def GFPFeatureExtraction(tempG):
     #visitedVertices = tempG.new_vertex_property("bool")
     #visitedVertices.a = False
 
-    print("Starting EgoNet Extraction")
+    print("Starting Vertex Level Extraction")
 
-    #for x in xrange(1, 5000):
-        # Choose a random vertex to start from between 0 and the number of vertices
-    #    v = tempG.vertex(randint(0, tempG.num_vertices()))
-    #    tempG, visitedVertices = vertexFeatureExtraction(v, tempG, egoNet, visitedVertices)
-
-    #vvGraph = GraphView(tempG, vfilt=visitedVertices)
-    #print vvGraph.num_vertices()
     for v in tempG.vertices():
         tempG = vertexFeatureExtraction(v, tempG, egoNet)
     return tempG
-    #return vvGraph
 
 def GFPFeatureCreation(tempG):
     print("Starting Feature Creation")
-    # Create node * feature matrix
+    # Create vertex * feature matrix
     # Loop through all the vertices and extract the vertices and attributes then all to a list
     featuresCollection = [ [], [], [], [], [], [] ]
     f = []
@@ -143,12 +130,8 @@ def GFPFeatureCreation(tempG):
         featuresCollection[1].append(tempG.vp.lc[v])
         featuresCollection[2].append(tempG.vp.tHN[v])
         featuresCollection[3].append(tempG.vp.nCCP[v])
-        #features[4].append(tempG.vp.nEEG[v])
         featuresCollection[4].append(tempG.vp.pR[v])
-        #print tempG.vp.pR[v]
         featuresCollection[5].append(tempG.vp.eV[v])
-        #features[5].append(tempG.vp.oEEG[v])
-        #features[6].append(tempG.vp.oNEG[v])
 
     for i in range(6):
         median = numpy.median(featuresCollection[i])
@@ -177,7 +160,7 @@ def GFPSingleFingerprint(tempG):
     # Generate a FingerPrint for a single graph
     tempG = GFPFeatureExtraction(tempG)
     features = GFPFeatureCreation(tempG)
-    #gloalFeatures = globalFeatureExtraction(G1)
+    gloalFeatures = globalFeatureExtraction(G1)
 
     return features
     #return [features, gloalFeatures]

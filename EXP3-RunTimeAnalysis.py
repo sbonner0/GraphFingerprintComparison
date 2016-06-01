@@ -1,3 +1,18 @@
+# Writen by Stephen Bonner 2016
+#This file is part of GraphFingerprintComparison.
+
+#GraphFingerprintComparison is free software: you can redistribute it and/or modify
+#it under the terms of the GNU General Public License as published by
+#the Free Software Foundation, either version 3 of the License, or
+#(at your option) any later version.
+
+#GraphFingerprintComparison is distributed in the hope that it will be useful,
+#but WITHOUT ANY WARRANTY; without even the implied warranty of
+#MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#GNU General Public License for more details.
+
+#You should have received a copy of the GNU General Public License
+#along with GraphFingerprintComparison.  If not, see <http://www.gnu.org/licenses/>.
 from graph_tool.all import *
 import os, csv, time, datetime, sys
 import GFP
@@ -5,15 +20,15 @@ import NetSimilie
 from pylab import *
 from tabulate import tabulate
 
-# Code for the experiment measuring the rumtime of the code
+# Code for the experiment measuring the rumtime
 if __name__ == "__main__":
     finalR = []
     row = ["GraphName", "GFPSingle", "GFPGlobal", "GFPTotal", "NetSimile"]
     finalR.append(row)
     resultFile = open('EXP3Results.txt', 'w')
 
-    #for subdir, dirs, files in os.walk("/home/lzdh59/NetworkData"):
-    for subdir, dirs, files in os.walk("/Volumes/Share_Drive/NetworkData/LCCT/"):
+    # Please put the directory of your SNAP files here
+    for subdir, dirs, files in os.walk(""):
         for filename in files:
             g = Graph()
             edges = []
